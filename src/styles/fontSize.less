@@ -1,0 +1,38 @@
+//设置系统字体大小
+.fontSize{
+    font-size: @themeFontSize;
+}
+
+
+//修改antd组件字体大小
+/* 
+1 按钮
+2 表格
+3 输入框
+4 选择
+5 表单
+6 卡片
+
+
+
+*/
+.ant-pagination, //分页
+.ant-descriptions-item-content,
+.ant-descriptions-item-label,
+.ant-menu, //菜单
+.ant-table.ant-table-small, //表格
+.ant-table,
+.ant-tabs, //tabs
+.ant-tabs-tab,
+.ant-card, 
+.ant-tree,
+.ant-btn{
+    font-size: @themeFontSize !important;
+}
+.ant-btn{
+    line-height:@themeFontSize !important;
+}
+
+.ant-card-head{
+    font-size: calc(@themeFontSize + 2px) !important;
+}

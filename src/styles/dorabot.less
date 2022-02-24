@@ -1,0 +1,104 @@
+@import "./theme.less";
+@import "./fontSize.less";
+//弹窗
+.dorabot-small-modal{
+  .ant-modal-body{
+    padding: 8px 24px;
+  }
+}
+
+.styleMarginTop{
+  margin-top: 16px;
+}
+.styleHeight100{
+  height: 100%;
+}
+
+
+.dorabot-btns{
+  button+button{
+    margin-left: 4px;
+  }
+  margin-bottom: 4px;
+}
+
+.col-margin-left,
+.col-margin-right{
+  .ant-card{
+    height: 100%;
+    margin: 0 6px;
+}
+}
+.col-margin-left{
+  .ant-card{
+    margin-left: 0;
+}
+}
+.col-margin-right{
+  .ant-card{
+    margin-right: 0;
+}
+}
+
+.cus-test{
+  .ant-table-cell{
+    // background-color: red;
+  //  color: #fff;
+  }
+}
+
+.modal-footer-right{
+  text-align: right;
+  padding-top: 6px;
+  button+button{
+    margin-right: 4px;
+  }
+
+}
+.dorabot-label-item{
+  display: inline-block;
+  margin-right: 4px;
+  position: relative;
+  padding-left: 42px;
+  &>span.title{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 42px;
+    height: 32px;
+    display: block;
+    line-height: 32px;
+  }
+}
+
+//字红色
+.fontcolor_red{
+  color: red;
+}
+.fontcolor_green{
+  color: green;
+}
+
+
+
+.main {
+  width: 368px;
+  margin: 0 auto;
+  @media screen and (max-width:576px) {
+    width: 95%;
+  }
+
+
+  .other {
+    text-align: left;
+    margin-top: 24px;
+    line-height: 22px;
+
+    .register {
+      float: right;
+    }
+  }
+}
+
+
+
