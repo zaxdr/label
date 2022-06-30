@@ -2,7 +2,7 @@ import jsPDF from "jspdf"
 import { useCallback, useEffect, useRef } from "react"
 import qrcode from "qrcode"
 import { useSelector } from "react-redux"
-import IStore from "@/model/StoresModel"
+import IStore, { IPageStore } from "@/model/StoresModel"
 import { createOneCode, createQrCode } from "./labelUtils"
 
 interface QrImg {
@@ -37,8 +37,8 @@ const crateImgList = async (list: string[]): Promise<QrImg[]> => {
 
 
 
-export const useCreatePDF = () => {
-    const { codeData, paperData, isContent, contentData, qrType } = useSelector((store: IStore) => store.pageStore);
+export const useCreatePDF = ({codeData, paperData, isContent, contentData, qrType }) => {
+  
     const createImgBase64Str = useCallback(async (value) => {
         let base64Str = "";
         if (qrType === "QRCode") {
@@ -89,4 +89,59 @@ export const useCreatePDF = () => {
     return {
         create
     }
+}
+
+
+type IOptions = Omit<IPageStore,"data">
+
+
+export const customCreatePDF = async (list:string[],callback:(pdf:jsPDF)=>void,options:IOptions)=>{
+    const {codeData, paperData, isContent, contentData, qrType  } = options;
+    const createImgBase64Str = async (value:string) => {
+        let base64Str = "";
+        if (qrType === "QRCode") {
+            base64Str = await createQrCode(value);
+        } else {
+            base64Str = await createOneCode(value, qrType);
+        }
+        return base64Str
+    }
+
+    //生成图片列表
+    const creareImgList = async (tempList: string[]) => {
+        let tempData: QrImg[] = []
+        for (let i = 0; i < tempList.length; i++) {
+            let value = tempList[i];
+            let st = await createImgBase64Str(value);
+            if (st) {
+                tempData.push({ code: value, src: st })
+            }
+        }
+        return tempData
+    }
+
+    let tempList = await creareImgList(list);  
+    let len: number = tempList.length;
+    const pdf: jsPDF = new jsPDF("l", paperData.unit, [paperData.height, paperData.width]);
+    for (let i = 0; i < len; i++) {
+        let item = tempList[i];
+        pdf.addImage({
+            imageData: item.src,
+            x: codeData.x,
+            y: codeData.y,
+            width: codeData.w,
+            height: codeData.h
+        })
+        if (isContent) {
+            pdf.setFontSize(contentData.fontSize);
+            pdf.text(item.code, contentData.x, contentData.y)
+        }
+        if (i !== len - 1) {
+            pdf.addPage()
+        }
+    }
+    callback(pdf)
+
+
+
 }
