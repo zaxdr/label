@@ -19,17 +19,28 @@ const LeftComponent = () => {
 
     //修改码的类型
     const changeQrType = useCallback((e: QRType) => {
+        if(e==="UPC"){
+            changeContent("text","049000011340")
+        }
         dispatch(setQrType(e));
     }, [qrType, dispatch])
 
     //修改纸张属性
     const changePaperData = useCallback((k: IPaperKeys, v: UnitType | number) => {
-        dispatch(setPaperData({ k, v }))
+        if(v && v.toString().length > 0){
+            dispatch(setPaperData({ k, v }))
+        }else{
+            message.error("值不可以为空")
+        }
     }, [dispatch])
 
     //修改码的属性
     const changeCodeData = useCallback((k: ICodeKeys, v: number) => {
-        dispatch(setCodeData({ k, v }))
+        if(v && v.toString().length > 0){
+            dispatch(setCodeData({ k, v }))
+        }else{
+            message.error("值不可以为空")
+        }
     }, [dispatch])
 
     //显示影藏
@@ -39,7 +50,12 @@ const LeftComponent = () => {
 
     //修改内容值
     const changeContent = useCallback((k: IContentKeys, v: string | number) => {
-        dispatch(setContentData({ k, v }))
+        if(v && v.toString().length > 0){
+            dispatch(setContentData({ k, v }))
+        }else{
+            message.error("值不可以为空")
+        }
+      
     }, [dispatch])
 
     //选择配置
@@ -77,10 +93,10 @@ const LeftComponent = () => {
     return <>
         <Card size="small" title="纸张大小" >
             <LabelItem title="宽">
-                <InputNumber className="w100" value={paperData.width} onChange={e => changePaperData("width", e)} />
+                <InputNumber className="w100" min={0} minLength={1} value={paperData.width} onChange={e => changePaperData("width", e)} />
             </LabelItem>
             <LabelItem title="高">
-                <InputNumber className="w100" value={paperData.height} onChange={e => changePaperData("height", e)} />
+                <InputNumber className="w100" min={0} minLength={1} value={paperData.height} onChange={e => changePaperData("height", e)} />
             </LabelItem>
             <LabelItem title="单位">
                 <Select className="w100" value={paperData.unit} onChange={e => changePaperData("unit", e)}>
@@ -100,20 +116,20 @@ const LeftComponent = () => {
                 </Select>
             </LabelItem>
             <LabelItem title="宽">
-                <InputNumber className="w100" value={codeData.w} onChange={e => changeCodeData("w", e)} />
+                <InputNumber className="w100" min={0} minLength={1}  value={codeData.w} onChange={e => changeCodeData("w", e)} />
             </LabelItem>
             <LabelItem title="高">
-                <InputNumber className="w100" value={codeData.h} onChange={e => changeCodeData("h", e)} />
+                <InputNumber className="w100" min={0} minLength={1}  value={codeData.h} onChange={e => changeCodeData("h", e)} />
             </LabelItem>
             <LabelItem title="X">
-                <InputNumber className="w100" value={codeData.x} onChange={e => changeCodeData("x", e)} />
+                <InputNumber className="w100" min={0} minLength={1}  value={codeData.x} onChange={e => changeCodeData("x", e)} />
             </LabelItem>
             <LabelItem title="Y">
-                <InputNumber className="w100" value={codeData.y} onChange={e => changeCodeData("y", e)} />
+                <InputNumber className="w100" min={0} minLength={1}  value={codeData.y} onChange={e => changeCodeData("y", e)} />
             </LabelItem>
         </Card>
+  
         <Card size="small" title="内容" style={{ marginTop: 8 }} extra={<Switch checked={isContent} checkedChildren="显示" unCheckedChildren="影藏" onChange={handleHide} />}>
-            <VisibleShowNode visible={isContent}>
                 <LabelItem title="初始化值">
                     <Input className="w100" value={contentData.text} onChange={e => changeContent("text", e.target.value)} />
                 </LabelItem>
@@ -125,12 +141,12 @@ const LeftComponent = () => {
                     </Select>
                 </LabelItem>
                 <LabelItem title="X">
-                    <InputNumber className="w100" value={contentData.x} onChange={e => changeContent("x", e)} />
+                    <InputNumber className="w100" min={0} minLength={1}  value={contentData.x} onChange={e => changeContent("x", e)} />
                 </LabelItem>
                 <LabelItem title="Y">
-                    <InputNumber className="w100" value={contentData.y} onChange={e => changeContent("y", e)} />
+                    <InputNumber className="w100" min={0} minLength={1}  value={contentData.y} onChange={e => changeContent("y", e)} />
                 </LabelItem>
-            </VisibleShowNode>
+
         </Card>
         <Card size="small" style={{ marginTop: 8 }} >
 
