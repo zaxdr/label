@@ -15,33 +15,35 @@ const ContentComponent = () => {
     const pdfRef = useRef<URL>();
     useEffect(() => {
         clearTimeout(time);
-        pdfRef.current = null;
-        time = setTimeout(async () => {
-            let base64Str = "";
-            if (qrType === "QRCode") {
-                base64Str = await createQrCode(contentData.text);
-            } else {
-                base64Str = await createOneCode(contentData.text, qrType);
-            }
-            //创建一个 7cm宽 5cm高 每页的PDF
-            const pdf: jsPDF = new jsPDF("l", paperData.unit, [paperData.height, paperData.width]);
-            pdf.addImage({
-                imageData: base64Str,
-                x: codeData.x,
-                y: codeData.y,
-                width: codeData.w,
-                height: codeData.h
-            })
-            if (isContent) {
-                pdf.setFontSize(contentData.fontSize);
-                pdf.text(contentData.text, contentData.x, contentData.y)
-            }
-            let urlObject = pdf.output("bloburi")
-            pdfRef.current = urlObject;
-            pdfToimg(urlObject, (v: string) => {
-                setUrl(v);
-            })
-        }, 300)
+        if(contentData.text && contentData.text.length>0){
+            pdfRef.current = null;
+            time = setTimeout(async () => {
+                let base64Str = "";
+                if (qrType === "QRCode") {
+                    base64Str = await createQrCode(contentData.text);
+                } else {
+                    base64Str = await createOneCode(contentData.text, qrType);
+                }
+                //创建一个 7cm宽 5cm高 每页的PDF
+                const pdf: jsPDF = new jsPDF("l", paperData.unit, [paperData.height, paperData.width]);
+                pdf.addImage({
+                    imageData: base64Str,
+                    x: codeData.x || 0,
+                    y: codeData.y || 0,
+                    width: codeData.w || 0,
+                    height: codeData.h || 0
+                })
+                if (isContent) {
+                    pdf.setFontSize(contentData.fontSize);
+                    pdf.text(contentData.text, contentData.x, contentData.y)
+                }
+                let urlObject = pdf.output("bloburi")
+                pdfRef.current = urlObject;
+                pdfToimg(urlObject, (v: string) => {
+                    setUrl(v);
+                })
+            }, 300)
+        }
         return () => {
             clearTimeout(time);
         }
