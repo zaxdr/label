@@ -9,59 +9,59 @@ import { pageStoreInit } from "@/stores/pageStore";
 
 
 export const pdfToimg = (url: URL, callback?: any) => {
-  let loadingTask: any = getDocument(url);
-  loadingTask.promise.then((pdf: any) => {
-    //页数
-    let numPages = pdf.numPages;
-    let scale = 2;
-    let Mycanvas = document.createElement("canvas");
-    let imgList: any = [];
-    let top = 0;
-    let height = 0;
-    let width = 0;
-    let okRender = new Promise(async (res: any, rej) => {
-      for (let i = 1; i <= numPages; i++) {
-        let page = await pdf.getPage(i);
-        let viewport = page.getViewport({
-          scale: scale,
-        });
-        let canvas = document.createElement("canvas");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        let context = canvas.getContext("2d");
-        let renderContext = {
-          canvasContext: context, // 此为canvas的context
-          viewport: viewport,
-        };
-        let success = await page.render(renderContext).promise;
-        if (i === 1) {
-          height = viewport.height;
-          width = viewport.width;
-          Mycanvas.height = viewport.height * numPages;
-          Mycanvas.width = viewport.width;
-        }
-        let dataURL = canvas.toDataURL("image/jpeg", 1);
-        imgList.push(dataURL);
-        if (i === numPages) {
-          res();
-        }
-      }
-    });
-    okRender.then(() => {
-      let context = Mycanvas.getContext("2d");
-      imgList.forEach((item: any, index: number) => {
-        var image = document.createElement("img");
-        image.src = item;
-        image.onload = async () => {
-          context.drawImage(image, 0, top, width, height);
-          top += height;
-          if (index === imgList.length - 1) {
-            callback(Mycanvas.toDataURL("image/jpeg", 1));
+    let loadingTask: any = getDocument(url);
+    loadingTask.promise.then((pdf: any) => {
+      //页数
+      let numPages = pdf.numPages;
+      let scale = 2;
+      let Mycanvas = document.createElement("canvas");
+      let imgList: any = [];
+      let top = 0;
+      let height = 0;
+      let width = 0;
+      let okRender = new Promise(async (res: any, rej) => {
+        for (let i = 1; i <= numPages; i++) {
+          let page = await pdf.getPage(i);
+          let viewport = page.getViewport({
+            scale: scale,
+          });
+          let canvas = document.createElement("canvas");
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          let context = canvas.getContext("2d");
+          let renderContext = {
+            canvasContext: context, // 此为canvas的context
+            viewport: viewport,
+          };
+          let success = await page.render(renderContext).promise;
+          if (i === 1) {
+            height = viewport.height;
+            width = viewport.width;
+            Mycanvas.height = viewport.height * numPages;
+            Mycanvas.width = viewport.width;
           }
-        };
+          let dataURL = canvas.toDataURL("image/jpeg", 1);
+          imgList.push(dataURL);
+          if (i === numPages) {
+            res();
+          }
+        }
       });
-    });
-  });
+      okRender.then(() => {
+        let context = Mycanvas.getContext("2d");
+        imgList.forEach((item: any, index: number) => {
+          var image = document.createElement("img");
+          image.src = item;
+          image.onload = async () => {
+            context.drawImage(image, 0, top, width, height);
+            top += height;
+            if (index === imgList.length - 1) {
+              callback(Mycanvas.toDataURL("image/jpeg", 1));
+            }
+          };
+        });
+      });
+    })
 };
 
 
@@ -87,14 +87,20 @@ export const printPdf = function (url: URL) {
 export const createOneCode = (text: string, type: Omit<QRType, "QRCode">): Promise<string> => {
   return new Promise((rv, rj) => {
     let elm: HTMLCanvasElement = document.createElement("canvas");
-    jsbarcode(elm, text, {
-      width: 3,
-      height: 80,
-      format: type as string,
-      displayValue: false,
-    })
-    let base = elm.toDataURL("image/png");
-    rv(base)
+    try {
+      jsbarcode(elm, text, {
+        width: 3,
+        height: 80,
+        format: type as string,
+        displayValue: false,
+      })
+      let base = elm.toDataURL("image/png");
+      rv(base)
+    } catch (error) {
+        if(type === "UPC" ){
+          message.success(`${text} 不是有效的UPS码格式（示例：049000011340） `) 
+        }
+    }
   })
 }
 
@@ -184,6 +190,39 @@ export const createList = (start: string, end: string, num: number, total: numbe
       for (let i = sv; i < sum; i++) {
         list.push(...new Array(num).fill(startValue + i))
       }
+    }
+  }
+  return list;
+}
+
+/**
+ * 
+ * @param start 开始值
+ * @param num 倍数
+ * @param total 生成的总数
+ * @param isStep 是否递增
+ */
+export const createListV2 = (start:string,num:number,total:number,isStep:boolean = false)=>{
+
+  let list: string[] = [];
+  if(!isStep){ // 不用递增
+    new Array(total).fill(0).map(it => {
+      list.push(... new Array(num).fill(start))
+    })
+  }else{
+    //需要递增
+    const REG = /(\d+)$/g; //获取字符串的数字部分
+    let v1: null | Array<string> = REG.exec(start);
+    if(v1){
+      let v = v1[0], len = v.length;
+      let  startValue = start.substring(0, start.length - len);
+      let sv = Number(v), sum = sv + total;
+      for (let i = sv; i < sum; i++) {
+        list.push(...new Array(num).fill(startValue + i))
+      }
+    }else{
+      message.error("开始值不是以数值结尾");
+      return [];
     }
   }
   return list;
