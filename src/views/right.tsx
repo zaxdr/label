@@ -1,5 +1,6 @@
 import LabelItem from "@/components/comm/LabelItem";
 import VisibleNode from "@/components/comm/VisibleNode";
+import GitComponent from "@/components/github";
 import { DataType, DataTypeList } from "@/model/options";
 import IStore from "@/model/StoresModel";
 import { setDataType } from "@/stores/pageStore";
@@ -78,7 +79,7 @@ const RightComponent = () => {
     },[start,getPrintList])
 
 
-    return <Card title="批量生成" size="small">
+    return <Card title="批量生成" size="small" extra={<GitComponent/>}>
         <LabelItem title="数据类型">
             <Select className="w100" value={dataType} onChange={changeDataType}>
                 {DataTypeList.map(it => {
